@@ -1,26 +1,27 @@
+import { NextResponse } from 'next/server'
 
-'use client';
+export async function GET() {
+  try {
+    // 🔴 GEÇİCİ OLARAK BİLGİLERİ DOĞRUDAN YAZIYORUZ (TEST İÇİN)
+    const supabaseUrl = 'https://aljqfilwbhfpgpvcgcvm.supabase.co'
+    const supabaseKey = 'sb_publishable_et5jO4D3ZQDHlnbFCE8udA_CUCBGlBW'
 
-import { useEffect, useState } from 'react';
+    const response = await fetch(`${supabaseUrl}/rest/v1/businesses?select=id&limit=1`, {
+      headers: {
+        apikey: supabaseKey,
+        Authorization: `Bearer ${supabaseKey}`,
+      },
+    })
 
-export default function Home() {
-  const [status, setStatus] = useState('Bağlanıyor...');
+    if (!response.ok) {
+      const error = await response.text()
+      console.error('Supabase response error:', error)
+      return NextResponse.json({ error: `Supabase error: ${error}` }, { status: response.status })
+    }
 
-  useEffect(() => {
-    fetch('/api/supabase-check')
-      .then(res => res.json())
-      .then(data => {
-        if (data.error) setStatus(`❌ Bağlı değil: ${data.error}`);
-        else setStatus('✅ Aktif');
-      })
-      .catch(err => setStatus(`❌ Hata: ${err.message}`));
-  }, []);
-
-  return (
-    <div style={{ textAlign: 'center', padding: '50px' }}>
-      <h1>Restoran SaaS</h1>
-      <p>Sistem çalışıyor!</p>
-      <p>Supabase bağlantısı: {status}</p>
-    </div>
-  );
+    return NextResponse.json({ status: 'ok' })
+  } catch (error) {
+    console.error('Fetch error:', error)
+    return NextResponse.json({ error: String(error) }, { status: 500 })
+  }
 }
