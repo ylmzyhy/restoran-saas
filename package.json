@@ -1,5 +1,5 @@
 {
-  "name": "restoran-saas",
+  "name": "restoran-saas-v2",
   "version": "1.0.0",
   "scripts": {
     "dev": "next dev",
