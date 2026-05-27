@@ -1,20 +1,26 @@
 
-import { createClient } from '@supabase/supabase-js'
-import { NextResponse } from 'next/server'
+'use client';
 
-export async function GET() {
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+import { useEffect, useState } from 'react';
 
-  const { error } = await supabase
-    .from('businesses')
-    .select('*', { count: 'exact', head: true })
+export default function Home() {
+  const [status, setStatus] = useState('Bağlanıyor...');
 
-  if (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 })
-  }
+  useEffect(() => {
+    fetch('/api/supabase-check')
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) setStatus(`❌ Bağlı değil: ${data.error}`);
+        else setStatus('✅ Aktif');
+      })
+      .catch(err => setStatus(`❌ Hata: ${err.message}`));
+  }, []);
 
-  return NextResponse.json({ status: 'ok' })
+  return (
+    <div style={{ textAlign: 'center', padding: '50px' }}>
+      <h1>Restoran SaaS</h1>
+      <p>Sistem çalışıyor!</p>
+      <p>Supabase bağlantısı: {status}</p>
+    </div>
+  );
 }
